@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Expense Tracker</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: auto;
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    input, select, button {
+      width: 90%;
+      padding: 10px;
+      margin: 8px;
+      border-radius: 5px;
+      border: none;
+    }
+
+    button {
+      background: #22c55e;
+      color: white;
+      cursor: pointer;
+    }
+
+    .expense-item {
+      display: flex;
+      justify-content: space-between;
+      background: #334155;
+      margin: 5px;
+      padding: 8px;
+      border-radius: 5px;
+    }
+
+    .delete {
+      color: red;
+      cursor: pointer;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>💸 Expense Tracker</h2>
+
+    <input type="text" id="desc" placeholder="Description">
+    <input type="number" id="amount" placeholder="Amount">
+
+    <select id="category">
+      <option>Food</option>
+      <option>Travel</option>
+      <option>Shopping</option>
+      <option>Other</option>
+    </select>
+
+    <button onclick="addExpense()">Add Expense</button>
+
+    <h3>Total: ₹<span id="total">0</span></h3>
+
+    <div id="list"></div>
+  </div>
+
+  <script>
+    let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+
+    function saveData() {
+      localStorage.setItem("expenses", JSON.stringify(expenses));
+    }
+
+    function render() {
+      const list = document.getElementById("list");
+      const totalEl = document.getElementById("total");
+
+      list.innerHTML = "";
+      let total = 0;
+
+      expenses.forEach((exp, index) => {
+        total += exp.amount;
+
+        const div = document.createElement("div");
+        div.className = "expense-item";
+        div.innerHTML = `
+          ${exp.desc} (₹${exp.amount}) - ${exp.category}
+          <span class="delete" onclick="deleteExpense(${index})">❌</span>
+        `;
+        list.appendChild(div);
+      });
+
+      totalEl.innerText = total;
+    }
+
+    function addExpense() {
+      const desc = document.getElementById("desc").value;
+      const amount = document.getElementById("amount").value;
+      const category = document.getElementById("category").value;
+
+      if (desc === "" || amount === "") {
+        alert("Enter all fields");
+        return;
+      }
+
+      expenses.push({
+        desc,
+        amount: Number(amount),
+        category
+      });
+
+      saveData();
+      render();
+
+      document.getElementById("desc").value = "";
+      document.getElementById("amount").value = "";
+    }
+
+    function deleteExpense(index) {
+      expenses.splice(index, 1);
+      saveData();
+      render();
+    }
+
+    render();
+  </script>
+
+</body>
+</html>
